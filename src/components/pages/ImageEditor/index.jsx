@@ -1,51 +1,59 @@
 import React, { Component } from 'react';
 import html2canvas from 'html2canvas';
 import styles from './ImageEditor.module.css';
+import download from 'downloadjs';
 
 class ImageEditor extends Component {
-  state = {
+  initialState = {
     vertical: 0,
     horizontal: 0,
-    scale: 2,
-    transformScale: 1,
+    scale: 1,
     width: 540,
     height: 540,
   };
+
+  state = this.initialState;
+
+  captureRef = React.createRef();
 
   handleChange = (value, type) => {
     this.setState({ [type]: value });
   };
 
   handleClick = () => {
-    this.setState({ transformScale: 2, width: this.state.width * 2, height: this.state.height * 2 }, () => {
-      html2canvas(document.querySelector('#capture'), { scale: this.state.scale }).then(function(canvas) {
-        document.querySelector('#result').appendChild(canvas);
+    this.setState({ scale: 2, width: this.state.width * 2, height: this.state.height * 2 }, () => {
+      html2canvas(this.captureRef.current).then(canvas => {
+        const img = canvas.toDataURL('image/png');
+        download(img, 'original', 'image/png');
+        this.setState(this.initialState);
       });
     });
   };
 
   render() {
-    const { vertical, horizontal, renderCanvas } = this.state;
+    const { vertical, horizontal } = this.state;
     return (
       <div>
-        <div style={{ width: this.state.width, height: this.state.height }} className={styles.capture} id="capture">
+        {this.state.loading && <div className={styles.loading}>LOADING</div>}
+        <div
+          style={{ width: this.state.width, height: this.state.height }}
+          className={styles.capture}
+          id="capture"
+          ref={this.captureRef}
+        >
           <div className={styles.imageWrapper} id="image">
             <div style={{ backgroundPosition: `${horizontal}% ${vertical}%` }} className={styles.backgroundImage} />
             <div className={styles.frontImage} />
           </div>
-          <div
-            style={{ transform: `scale(${this.state.transformScale})` }}
-            className={styles.textWrapper}
-            id="text"
-          >
+          <div style={{ transform: `scale(${this.state.scale})` }} className={styles.textWrapper} id="text">
             <div className={styles.description}>
-              <h1 className={styles.title} contenteditable="true">
+              <h1 className={styles.title} contentEditable="true">
                 Таиланд из Казани
               </h1>
-              <p className={styles.text} contenteditable="true">
+              <p className={styles.text} contentEditable="true">
                 Горящие туры на вылет с 19 по 31 января
               </p>
-              <h2 className={styles.price} contenteditable="true">
+              <h2 className={styles.price} contentEditable="true">
                 От 52 900 рублей
               </h2>
             </div>
@@ -76,11 +84,6 @@ class ImageEditor extends Component {
             onChange={event => this.handleChange(event.target.value, 'horizontal')}
           />
         </label>
-        <input
-          type="number"
-          value={this.state.scale}
-          onChange={event => this.setState({ scale: event.target.value })}
-        />
         <button type="button" onClick={this.handleClick}>
           Capture
         </button>
