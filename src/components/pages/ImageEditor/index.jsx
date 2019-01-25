@@ -3,6 +3,8 @@ import html2canvas from 'html2canvas';
 import styles from './ImageEditor.module.css';
 import download from 'downloadjs';
 
+const SCALE = 2;
+
 class ImageEditor extends Component {
   initialState = {
     vertical: 0,
@@ -10,6 +12,7 @@ class ImageEditor extends Component {
     scale: 1,
     width: 540,
     height: 540,
+    file: null,
   };
 
   state = this.initialState;
@@ -20,32 +23,45 @@ class ImageEditor extends Component {
     this.setState({ [type]: value });
   };
 
-  handleClick = () => {
-    this.setState({ scale: 2, width: this.state.width * 2, height: this.state.height * 2 }, () => {
-      html2canvas(this.captureRef.current).then(canvas => {
-        const img = canvas.toDataURL('image/png');
-        download(img, 'original', 'image/png');
-        this.setState(this.initialState);
-      });
+  handleUpload = event => {
+    if (this.state.file) {
+      URL.revokeObjectURL(this.state.file);
+    }
+    this.setState({
+      file: URL.createObjectURL(event.target.files[0]),
     });
   };
 
+  handleClick = () => {
+    const prevState = this.state;
+    this.setState(
+      state => ({ scale: SCALE, width: state.width * SCALE, height: state.height * SCALE }),
+      () => {
+        html2canvas(this.captureRef.current).then(canvas => {
+          const img = canvas.toDataURL('image/png');
+          download(img, 'original', 'image/png');
+          this.setState(prevState);
+        });
+      },
+    );
+  };
+
   render() {
-    const { vertical, horizontal } = this.state;
+    const { vertical, horizontal, file, width, height, scale } = this.state;
     return (
       <div>
-        {this.state.loading && <div className={styles.loading}>LOADING</div>}
-        <div
-          style={{ width: this.state.width, height: this.state.height }}
-          className={styles.capture}
-          id="capture"
-          ref={this.captureRef}
-        >
+        <div style={{ width: width, height: height }} className={styles.capture} id="capture" ref={this.captureRef}>
           <div className={styles.imageWrapper} id="image">
-            <div style={{ backgroundPosition: `${horizontal}% ${vertical}%` }} className={styles.backgroundImage} />
+            <div
+              style={{
+                backgroundPosition: `${horizontal}% ${vertical}%`,
+                backgroundImage: file ? `url(${file})` : null,
+              }}
+              className={styles.backgroundImage}
+            />
             <div className={styles.frontImage} />
           </div>
-          <div style={{ transform: `scale(${this.state.scale})` }} className={styles.textWrapper} id="text">
+          <div style={{ transform: `scale(${scale})` }} className={styles.textWrapper} id="text">
             <div className={styles.description}>
               <h1 className={styles.title} contentEditable="true">
                 Таиланд из Казани
@@ -64,6 +80,7 @@ class ImageEditor extends Component {
             </div>
           </div>
         </div>
+        <input type="file" onChange={this.handleUpload} />
         <label>
           Vertical
           <input
