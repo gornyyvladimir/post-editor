@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "07a26feda38f2391bd88",
+    "revision": "51dd606cd3911641c1fd",
     "url": "/post-editor/static/css/main.c87c6aca.chunk.css"
   },
   {
-    "revision": "07a26feda38f2391bd88",
-    "url": "/post-editor/static/js/main.07a26fed.chunk.js"
+    "revision": "51dd606cd3911641c1fd",
+    "url": "/post-editor/static/js/main.51dd606c.chunk.js"
   },
   {
     "revision": "1874a3d4cfe55b6e22a0",
@@ -32,7 +32,7 @@ self.__precacheManifest = [
     "url": "/post-editor/static/media/Ossem-Rounded.f469d91b.woff"
   },
   {
-    "revision": "40354da633e824d2fb219aa3346db061",
+    "revision": "3ea64dbd3e4cf36f645ee6b878dc6d01",
     "url": "/post-editor/index.html"
   }
 ];
