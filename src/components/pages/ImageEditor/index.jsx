@@ -102,7 +102,7 @@ class ImageEditor extends Component {
           />
         </label>
         <button type="button" onClick={this.handleClick}>
-          Capture
+          Сохранить
         </button>
         <div id="result" />
       </div>
